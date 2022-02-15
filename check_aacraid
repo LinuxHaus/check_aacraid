@@ -14,9 +14,9 @@ segmentfind = re.compile(r'(\d+,\d+)')
 def check_arcconf():
 	arcconf = None
 	for p in os.environ['PATH'].split(os.path.pathsep)+['/usr/StorMan/']:
-	    if os.path.isfile(os.path.join(p, 'arcconf')):
-		arcconf = os.path.join(p, 'arcconf')
-		break
+		if os.path.isfile(os.path.join(p, 'arcconf')):
+			arcconf = os.path.join(p, 'arcconf')
+			break
 	return arcconf
 
 if not hasattr(subprocess, 'check_output'):
@@ -150,7 +150,7 @@ def cmk_info(controllerid):
     statustxt = 'OK'
     if cinfo['status'] != 'Optimal':
         status = 2
-	statustxt = 'CRITICAL'
+        statustxt = 'CRITICAL'
     item_name = 'Controller_'+str(controllerid)
     performance_data = '-'
     check_output = statustxt + " Model:%(model)s Serial:%(serial)s Bios:%(bios)s Firmware:%(firmware)s Driver:%(driver)s LDs:%(lds)s Status:%(status)s" % cinfo
@@ -160,25 +160,25 @@ def cmk_info(controllerid):
     for l in range(0,cinfo['lds']):
         linfo = get_logicaldevice_info(controllerid,l)
         status = 0
-	statustxt = 'OK'
-	if linfo['status'] != 'Optimal':
+        statustxt = 'OK'
+        if linfo['status'] != 'Optimal':
                 status = 2
-		statustxt = 'CRITICAL'
-	item_name = 'LogicalDevice_'+linfo['id']
-	performance_data = '-'
-	check_output = statustxt + " RAID:%(level)s Size:%(size)s Status:%(status)s" % linfo
+                statustxt = 'CRITICAL'
+        item_name = 'LogicalDevice_'+linfo['id']
+        performance_data = '-'
+        check_output = statustxt + " RAID:%(level)s Size:%(size)s Status:%(status)s" % linfo
         output.append("%s %s %s %s" % (status,item_name,performance_data,check_output) )
 
 	# LOGICAL DEVICE SEGMENTS
-	ldsegs = linfo['members']
-	segn = 0
-	for m in ldsegs:
+        ldsegs = linfo['members']
+        segn = 0
+        for m in ldsegs:
                 status = 0
-		statustxt = 'OK'
-		if m.startswith('Missing'): 
+                statustxt = 'OK'
+                if m.startswith('Missing'): 
                         status = 2 
-			statustxt = 'CRITICAL'
-		item_name = 'LogicalDevice_'+linfo['id']+'_Segment_'+str(segn) 
+                        statustxt = 'CRITICAL'
+                item_name = 'LogicalDevice_'+linfo['id']+'_Segment_'+str(segn) 
                 performance_data = '-'
                 check_output = statustxt + " " +  m
                 output.append("%s %s %s %s" % (status,item_name,performance_data,check_output) )	
@@ -192,7 +192,7 @@ def cmk_info(controllerid):
             statustxt = 'OK'
             if disks[k]['status'] not in ["Online", "Dedicated Hot-Spare", "Ready", "Online (JBOD)" ]:
                         status = 2 
-			statustxt = 'CRITICAL'
+                        statustxt = 'CRITICAL'
             item_name = 'Disk_'+disks[k]['id']
             performance_data = '-'
             check_output = statustxt + " DiskID:%(diskid)s Model:%(model)s Vendor:%(vendor)s Status:%(status)s" % disks[k]
@@ -200,10 +200,10 @@ def cmk_info(controllerid):
     return '\n'.join(output)
 
 if __name__ == '__main__':
-	arcconf = check_arcconf()
-        if arcconf:
-		n = get_num_controllers()
-		for c in range(1,n+1):
-	    		print cmk_info(c)
-	else:
-		print "3 No_arcconf_Found - UNKNOWN (No arcconf binary Found or no Adaptec Controller present (remove check from local checks))"
+    arcconf = check_arcconf()
+    if arcconf:
+        n = get_num_controllers()
+        for c in range(1,n+1):
+            print cmk_info(c)
+    else:
+        print "3 No_arcconf_Found - UNKNOWN (No arcconf binary Found or no Adaptec Controller present (remove check from local checks))"
